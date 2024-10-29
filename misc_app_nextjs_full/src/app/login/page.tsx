@@ -13,8 +13,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [errors, setErrors] = useState({ email: '', password: '' });
-  const dispatch = useAppDispatch()
-  const router = useRouter();
+    const dispatch = useAppDispatch();
+    const router = useRouter();
 
     // Load email from local storage if remember me was checked previously
     useEffect(() => {

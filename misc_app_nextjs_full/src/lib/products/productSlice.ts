@@ -1,27 +1,35 @@
 import { cart_orders, prod_list, user_orders } from '@/app/data/product.data';
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+    isLoading: false,
+    productsList: prod_list,
+    cartList: cart_orders,
+    userOrders: user_orders,
+    error: null
+};
+
 const productSlice = createSlice({
     name: 'product',
-    initialState: {
-        isloading:false,
-        productslist:prod_list,
-  cartList: cart_orders,
-  userorders: user_orders,
-  error: null
-    },
+    initialState,
     reducers: {
         setLoading: (state, action) => {
-            state.isloading = action.payload;
+            state.isLoading = action.payload;
         },
         setProducts: (state, action) => {
-            state.productslist = action.payload;
+            state.productsList = action.payload;
         },
-        setCartlist: (state, action) => {
-            state.cartList = action.payload;
+        setCartList: (state, action) => {
+            const newProductKey = action.payload.key; // Unique key for new product
+            const newProduct = action.payload.product; // New product details
+
+            state.cartList = {
+                ...state.cartList,
+                [newProductKey]: newProduct
+            };
         },
         setUserOrders: (state, action) => {
-            state.userorders = action.payload;
+            state.userOrders = action.payload;
         },
         setError: (state, action) => {
             state.error = action.payload;
@@ -29,6 +37,5 @@ const productSlice = createSlice({
     },
 });
 
-export const { setLoading, setProducts, setCartlist, setUserOrders, setError } = productSlice.actions;
-
+export const { setLoading, setProducts, setCartList, setUserOrders, setError } = productSlice.actions;
 export default productSlice;
