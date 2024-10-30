@@ -21,6 +21,7 @@ export default function Header() {
     const logoutUser = () => {
         setShow(false);
         dispatch(setUser(null));
+        localStorage.clear();
         router.push('/login');
     };
 

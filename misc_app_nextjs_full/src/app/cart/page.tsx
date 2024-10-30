@@ -1,23 +1,35 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState, useEffect } from "react";
 import { cart_orders } from "../data/product.data";
+import { useAppDispatch } from '../../lib/hooks';
+import './cart.css';
+import { setUserOrders } from "@/lib/products/productSlice";
+import Toaster from "../components/toaster";
 
 export default function Cart() {
+  const [showToaster, setShowToaster] = useState(false);
+  const [toasterMsg, setToasterMsg] = useState('');
   const [cartValues, setCartValues] = useState(Object.values(cart_orders));
   const [totalAmount, setTotalAmount] = useState(0);
+  const today = new Date();
+  const dispatch = useAppDispatch();
 
   // Calculate total amount whenever cart items change
   useEffect(() => {
-    const total = cartValues.reduce((acc, item) => acc + item.totalamt, 0);
+    const total = cartValues.reduce((acc, item) => Number(acc) + Number(item.totalamt), 0);
     setTotalAmount(total);
   }, [cartValues]);
 
   const updateTotal = (itemId: string, qty: number) => {
     setCartValues((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, qty, totalamt: item.price * qty } : item
-      )
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        const totalamt = (Number(item.price) * qty).toString();
+        return { ...item, qty, totalamt };
+      })
     );
   };
 
@@ -30,8 +42,27 @@ export default function Cart() {
   };
 
   const confirmOrder = () => {
-    alert("Order Confirmed");
+    const uniqueKey = `prod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    dispatch(setUserOrders({
+      key: uniqueKey,
+      "items": cartValues,
+      "orddate": formatDate(today)
+    }));
+    setToasterMsg('Your order is confirmed. Thank you for shopping with us.')
+    setShowToaster(true);
     clearCart();
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleString('en-US', {
+      month: 'short',    // "Oct"
+      day: 'numeric',    // "30"
+      year: 'numeric',   // "2024"
+      hour: 'numeric',   // "9"
+      minute: '2-digit', // "03"
+      second: '2-digit', // "01"
+      hour12: true       // AM/PM format
+    });
   };
 
   return (
@@ -53,11 +84,12 @@ export default function Cart() {
                   <div className="divTableCol">
                     <div className="media d-flex">
                       <a className="pull-left mr-2 ml-0">
-                        <img
-                          className="img-fluid"
+                        <Image
                           src={`/assets/${item.image}`}
-                          alt="product"
-                          style={{ width: "92px", height: "72px", marginLeft: "0" }}
+                          className="img-fluid"
+                          alt={item.name}
+                          height={72}
+                          width={92}
                         />
                       </a>
                       <div className="media-body">
@@ -74,10 +106,10 @@ export default function Cart() {
                     />
                   </div>
                   <div className="divTableCol">
-                    <strong>Rs.{item.price.toFixed(2)}</strong>
+                    <strong>Rs.{Number(item.price)}</strong>
                   </div>
                   <div className="divTableCol">
-                    <strong>Rs.{item.totalamt.toFixed(2)}</strong>
+                    <strong>Rs.{Number(item.totalamt)}</strong>
                   </div>
                   <div className="divTableCol">
                     <button
@@ -99,7 +131,7 @@ export default function Cart() {
                 </div>
                 <div className="divTableCol">
                   <h3>
-                    <strong>Rs.{totalAmount.toFixed(2)}</strong>
+                    <strong>Rs.{Number(totalAmount)}</strong>
                   </h3>
                 </div>
               </div>
@@ -136,6 +168,13 @@ export default function Cart() {
           <span>No Items Present in the Cart</span>
         </h2>
       )}
+      <Toaster
+        toastercolor="success"
+        headerMsg="Success"
+        bodyMsg={toasterMsg}
+        show={showToaster}
+        setShow={setShowToaster}
+      />
     </div>
   );
 }

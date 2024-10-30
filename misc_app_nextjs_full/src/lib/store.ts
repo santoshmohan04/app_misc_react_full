@@ -7,11 +7,11 @@ import CryptoJS from 'crypto-js';
 
 const SECRET_KEY = '10585911-321b-4394-8af3-185f25e0c407';
 
-const encryptData = (data:any) => {
+const encryptData = (data: any) => {
   return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
 };
 
-const decryptData = (data:any) => {
+const decryptData = (data: any) => {
   try {
     const bytes = CryptoJS.AES.decrypt(data, SECRET_KEY);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
@@ -22,20 +22,26 @@ const decryptData = (data:any) => {
 };
 
 const saveStateMiddleware = (store) => (next) => (action) => {
-  const result = next(action); // Process the action first
+  const result = next(action);
   const state = store.getState();
   const encryptedState = encryptData(state);
-  localStorage.setItem('reduxState', encryptedState);
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem('reduxState', encryptedState);
+  }
+
   return result;
 };
 
 const loadInitialState = () => {
-  const encryptedState = localStorage.getItem('reduxState');
-  if (encryptedState) {
-    const decryptedState = decryptData(encryptedState);
-    if (decryptedState) return decryptedState;
+  if (typeof window !== "undefined") {
+    const encryptedState = localStorage.getItem('reduxState');
+    if (encryptedState) {
+      const decryptedState = decryptData(encryptedState);
+      if (decryptedState) return decryptedState;
+    }
   }
-  return undefined; // Return undefined if no saved state
+  return undefined;
 };
 
 export const makeStore = () => {
@@ -43,7 +49,7 @@ export const makeStore = () => {
     reducer: { user: authSlice.reducer, products: productSlice.reducer },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(saveStateMiddleware),
-    preloadedState: loadInitialState()
+    preloadedState: loadInitialState(),
   });
 };
 

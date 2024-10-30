@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     isLoading: false,
     productsList: prod_list,
-    cartList: cart_orders,
+    cartList: cart_orders || null,
     userOrders: user_orders,
     error: null
 };
@@ -29,7 +29,17 @@ const productSlice = createSlice({
             };
         },
         setUserOrders: (state, action) => {
-            state.userOrders = action.payload;
+            const newProductKey = action.payload.key; 
+            const newItems = action.payload.items;
+            const order_data = action.payload.orddate;
+
+            state.userOrders = {
+                ...state.userOrders,
+                [newProductKey]: {
+                    "items":newItems,
+                    "orddate":order_data
+                }
+            };
         },
         setError: (state, action) => {
             state.error = action.payload;

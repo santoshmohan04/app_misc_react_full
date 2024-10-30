@@ -37,25 +37,25 @@ export default function Products() {
 
                 <ProductCategory
                     title="Cameras"
-                    icon="fas fa-camera"
+                    icon="bi bi-camera"
                     products={cameras}
                     onAddToCart={addtoCart}
                 />
                 <ProductCategory
                     title="Watches"
-                    icon="fas fa-clock"
+                    icon="bi bi-watch"
                     products={watches}
                     onAddToCart={addtoCart}
                 />
                 <ProductCategory
                     title="Shirts"
-                    icon="fas fa-tshirt"
+                    icon="bi bi-bag-check"
                     products={shirts}
                     onAddToCart={addtoCart}
                 />
                 <ProductCategory
                     title="Smartphones"
-                    icon="fas fa-mobile"
+                    icon="bi bi-phone"
                     products={smartphones}
                     onAddToCart={addtoCart}
                 />
