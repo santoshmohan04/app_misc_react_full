@@ -12,7 +12,6 @@ export default function Home() {
   const handleSelect = (selectedIndex: number) => {
     setIndex(selectedIndex);
   };
-
   return (
     <div className="container-fluid">
       <Carousel activeIndex={index} onSelect={handleSelect}>

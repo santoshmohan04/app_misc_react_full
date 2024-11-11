@@ -1,55 +1,12 @@
 'use client';
 
 import { configureStore } from '@reduxjs/toolkit';
-import authSlice from './auth/authSlice';
 import productSlice from './products/productSlice';
-import CryptoJS from 'crypto-js';
-
-const SECRET_KEY = '10585911-321b-4394-8af3-185f25e0c407';
-
-const encryptData = (data: any) => {
-  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
-};
-
-const decryptData = (data: any) => {
-  try {
-    const bytes = CryptoJS.AES.decrypt(data, SECRET_KEY);
-    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  } catch (e) {
-    console.error("Failed to decrypt state:", e);
-    return null;
-  }
-};
-
-const saveStateMiddleware = (store) => (next) => (action) => {
-  const result = next(action);
-  const state = store.getState();
-  const encryptedState = encryptData(state);
-
-  if (typeof window !== "undefined") {
-    localStorage.setItem('reduxState', encryptedState);
-  }
-
-  return result;
-};
-
-const loadInitialState = () => {
-  if (typeof window !== "undefined") {
-    const encryptedState = localStorage.getItem('reduxState');
-    if (encryptedState) {
-      const decryptedState = decryptData(encryptedState);
-      if (decryptedState) return decryptedState;
-    }
-  }
-  return undefined;
-};
+import authSlice from './auth/authSlice';
 
 export const makeStore = () => {
   return configureStore({
-    reducer: { user: authSlice.reducer, products: productSlice.reducer },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(saveStateMiddleware),
-    preloadedState: loadInitialState(),
+    reducer: { auth: authSlice.reducer, products: productSlice.reducer },
   });
 };
 

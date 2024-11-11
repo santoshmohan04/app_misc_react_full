@@ -2,14 +2,14 @@
 
 import {useAppSelector, useAppDispatch } from '../../lib/hooks'
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { setUser } from '@/lib/auth/authSlice';
+import { logoutUser } from '@/lib/auth/authSlice';
 
 
 export default function Header() {
@@ -18,19 +18,22 @@ export default function Header() {
     const dispatch = useAppDispatch();
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const logoutUser = () => {
+    const logout_User = () => {
         setShow(false);
-        dispatch(setUser(null));
-        localStorage.clear();
-        router.push('/login');
+        dispatch(logoutUser());
     };
+    const useremail = useAppSelector((state) => state.auth.loggedInUserDetails?.email);
 
-    const useremail = useAppSelector((state) => state.user.email);
+    useEffect(() => {
+        if (!useremail) {
+            router.push('/login');
+        }
+    }, [useremail, router]);
 
     return (
         <>
             <Navbar bg="dark" collapseOnSelect expand="lg" data-bs-theme="dark" fixed="top">
-                <Container>
+                <Container fluid>
                     <Navbar.Brand href="/">
                         <i className="bi bi-shop"></i> Lifestyle Store
                     </Navbar.Brand>
@@ -67,7 +70,8 @@ export default function Header() {
                 </Container>
             </Navbar>
             {/* Logout Modal */}
-            <Modal show={show} onHide={handleClose} centered>
+            <Modal show={show} onHide={handleClose} backdrop="static"
+        keyboard={false} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Log out</Modal.Title>
                 </Modal.Header>
@@ -83,7 +87,7 @@ export default function Header() {
                     <Button variant="danger" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={logoutUser}>
+                    <Button variant="primary" onClick={logout_User}>
                         Confirm
                     </Button>
                 </Modal.Footer>
