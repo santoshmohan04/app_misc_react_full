@@ -2,7 +2,14 @@
 import Image from 'next/image';
 import { Prodinfo } from '../data/product.data';
 
-export default function ProductCategory({ title, icon, products, onAddToCart }) {
+interface ProductCategoryProps {
+    readonly title: string;
+    readonly icon: string;
+    readonly products: readonly Prodinfo[];
+    readonly onAddToCart: (product: Prodinfo) => void;
+}
+
+export default function ProductCategory({ title, icon, products, onAddToCart }: ProductCategoryProps) {
     return (
         <div className="card mt-3">
             <div className="card-header">
@@ -22,7 +29,7 @@ export default function ProductCategory({ title, icon, products, onAddToCart }) 
                                 />
                                 <div className="card-body text-center">
                                     <h3 className="card-title">{product.name}</h3>
-                                    <p className="card-text">${product.price}</p>
+                                    <p className="card-text">Rs.{product.price}</p>
                                     <button
                                         type="button"
                                         className="btn btn-block btn-primary"

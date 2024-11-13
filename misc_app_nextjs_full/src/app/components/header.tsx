@@ -14,6 +14,7 @@ import { logoutUser } from '@/lib/auth/authSlice';
 
 export default function Header() {
     const [show, setShow] = useState(false);
+    const [isClient, setIsClient] = useState(false);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const handleClose = () => setShow(false);
@@ -25,6 +26,7 @@ export default function Header() {
     const useremail = useAppSelector((state) => state.auth.loggedInUserDetails?.email);
 
     useEffect(() => {
+        setIsClient(true);
         if (!useremail) {
             router.push('/login');
         }
@@ -40,26 +42,26 @@ export default function Header() {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="ms-auto">
-                            {useremail ? (
+                            {isClient && useremail ? (
                                 <>
                                     <Nav.Link href="/products">
-                                        <i className="fab fa-product-hunt"></i> Products
+                                        <i className="bi bi-bag-check"></i> Products
                                     </Nav.Link>
                                     <NavDropdown title={<><i className="bi bi-person-circle"></i> {useremail}</>} id="navbarScrollingDropdown">
                                         <NavDropdown.Item href="/cart">
-                                            <i className="bi bi-bag-check"></i> Cart
+                                            <i className="bi bi-cart"></i> Cart
                                         </NavDropdown.Item>
                                         <NavDropdown.Item href="/settings">
                                             <i className="bi bi-gear"></i> Settings
                                         </NavDropdown.Item>
                                         <NavDropdown.Item onClick={handleShow}>
-                                            <i className="bi bi-box-arrow-in-right"></i> Logout
+                                            <i className="bi bi-box-arrow-left"></i> Logout
                                         </NavDropdown.Item>
                                     </NavDropdown>
                                 </>
                             ) : (
-                                <Nav.Link href="/login">
-                                    <i className="bi bi-box-arrow-in-right"></i> Login
+                                isClient && <Nav.Link href="/login">
+                                    <i className="bi bi-box-arrow-right"></i> Login
                                 </Nav.Link>
                             )}
                             <Nav.Link href="/contact">

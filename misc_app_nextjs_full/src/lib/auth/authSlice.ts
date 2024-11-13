@@ -3,13 +3,14 @@ import { LoginPayload, ErrorResponse, AuthState } from './data';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updatePassword,
   signOut,
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
 // Error handling helper
-const handleError = (error: ErrorResponse): string => {
-  console.error('Error:', error);
+const handleError = (error: any): string => {
+  console.error('Error:', error, typeof error);
   let errorMessage = 'An unknown error occurred!';
   const errorCode = error.error?.message;
 
@@ -46,7 +47,7 @@ export const loginUser = createAsyncThunk(
     }
       return { uid, email, displayName };
     } catch (error) {
-      return rejectWithValue(handleError(error as ErrorResponse));
+      return rejectWithValue(handleError(error));
     }
   }
 );
@@ -66,6 +67,22 @@ export const signupUser = createAsyncThunk(
       return { uid, email, displayName };
     } catch (error) {
       return rejectWithValue(handleError(error as ErrorResponse));
+    }
+  }
+);
+
+export const updatePswd = createAsyncThunk(
+  'auth/updatePswd',
+  async (payload:{pswd:string}, { rejectWithValue }) => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await updatePassword(user, payload.pswd);
+      } else {
+        throw new Error('No user is currently signed in.');
+      }
+    } catch (error) { 
+      return rejectWithValue(handleError(error as ErrorResponse));  
     }
   }
 );
